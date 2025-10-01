@@ -3,7 +3,7 @@ import threading
 import numpy as np
 import os
 from ultralytics import YOLO
-import ollama
+#import ollama
 import base64
 import asyncio
 import threading
@@ -14,7 +14,7 @@ import os
 import sys
 from flask import Flask, Response, request, jsonify
 from flask_cors import CORS
-
+from datetime import datetime
 
 ########################################################
 ###  Class for handling real time streaming usin REST methods
@@ -214,8 +214,8 @@ def send_image_to_VLLM( image , index):
         ]
 
         # Make the chat request to Ollama
-        response = ollama.chat(model='gemma3:4b', messages=messages)
-
+        #response = ollama.chat(model='gemma3:4b', messages=messages)
+        response = []
         # Print the model's response
         log_message("-------" + str(index) + "---------------" + response['message']['content'])
         
@@ -440,8 +440,19 @@ def parallel_combine_videos(video_files,freq_ollama):
                 for pk in persons:
                     pk.draw(combined)
 
+                
+                # Get the current datetime object
+                current_datetime = datetime.now()
+                format_string = "%Y-%m-%d %H:%M:%S"
+                time_string = current_datetime.strftime(format_string)
+                cv2.putText(combined, time_string, (int(20), int(50)), 1,1, (255, 255, 255))
+                
+                
                 cv2.putText(combined, f"id:{findex}", (int(20),int(20) ), 1, 0.75, (255, 255, 255))
+
+                
         
+
                 cv2.imshow(f"YOLO + SORT Tracking {idCh}", combined)
             # print (f"update {findex}")
 
@@ -493,6 +504,12 @@ def generate_frames(idSource=1):
             time.sleep(milliseconds_to_sleep / 1000)
             continue
         resized = cv2.resize(frame, (RESIZE_CAM_WIDTH, RESIZE_CAM_HEIGHT))
+        
+        current_datetime = datetime.now()
+        format_string = "%Y-%m-%d %H:%M:%S"
+        time_string = current_datetime.strftime(format_string)
+        cv2.putText(resized, time_string, (int(20), int(50)), 1,1, (255, 255, 255))
+
        
         #frame = process_frame(frame, idx)
         ret, buffer = cv2.imencode('.jpg', resized)
